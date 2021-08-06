@@ -2,14 +2,17 @@
 @using Microsoft.CodeAnalysis
 @using Microsoft.CodeAnalysis.CSharp
 
-<button @onclick="Run">Run</button>
+<button @onclick="RunSync">Run sync</button>
+<button @onclick="RunAsyncVoid">Run async void</button>
+<button @onclick="RunAsyncTask">Run async Task</button>
+<button @onclick="RunCompilation">Run compilation</button>
 
 @code
 {
     [Inject]
     public HttpClient Client { get; set; }
 
-    public async Task Run()
+    public async Task RunCompilation()
     {
         var stream = await Client.GetStreamAsync("_framework/System.Private.CoreLib.dll");
         MetadataReference reference = MetadataReference.CreateFromStream(stream);
@@ -19,9 +22,31 @@
             .AddReferences(new MetadataReference[] { reference })
             .AddSyntaxTrees(CSharpSyntaxTree.ParseText("int x = 0;", new CSharpParseOptions(LanguageVersion.Latest)));
 
+        // Should write:
+        // (1,5): warning CS0219: The variable 'x' is assigned but its value is never used
         foreach (Diagnostic diagnostic in compilation.GetDiagnostics())
         {
             Console.WriteLine(diagnostic.ToString());
         }
     }
+
+    public void RunSync()
+    {
+        Console.WriteLine("void RunSync");
+    }
+
+    public async void RunAsyncVoid()
+    {
+        await Task.Delay(100);
+
+        Console.WriteLine("async void RunAsyncVoid");
+    }
+
+    public async Task RunAsyncTask()
+    {
+        await Task.Delay(100);
+
+        Console.WriteLine("Task RunAsyncTask");
+    }
+
 }
