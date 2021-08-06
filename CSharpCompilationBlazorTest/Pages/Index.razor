@@ -1,0 +1,27 @@
+﻿@page "/"
+@using Microsoft.CodeAnalysis
+@using Microsoft.CodeAnalysis.CSharp
+
+<button @onclick="Run">Run</button>
+
+@code
+{
+    [Inject]
+    public HttpClient Client { get; set; }
+
+    public async Task Run()
+    {
+        var stream = await Client.GetStreamAsync("_framework/System.Private.CoreLib.dll");
+        MetadataReference reference = MetadataReference.CreateFromStream(stream);
+
+        CSharpCompilation compilation = CSharpCompilation.Create("Test")
+            .WithOptions(new CSharpCompilationOptions(OutputKind.ConsoleApplication))
+            .AddReferences(new MetadataReference[] { reference })
+            .AddSyntaxTrees(CSharpSyntaxTree.ParseText("int x = 0;", new CSharpParseOptions(LanguageVersion.Latest)));
+
+        foreach (Diagnostic diagnostic in compilation.GetDiagnostics())
+        {
+            Console.WriteLine(diagnostic.ToString());
+        }
+    }
+}
