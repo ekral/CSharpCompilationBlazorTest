@@ -3,8 +3,6 @@
 @using Microsoft.CodeAnalysis.CSharp
 
 <button @onclick="RunSync">Run sync</button>
-<button @onclick="RunAsyncVoid">Run async void</button>
-<button @onclick="RunAsyncTask">Run async Task</button>
 <button @onclick="RunCompilation">Run compilation</button>
 
 @code
@@ -34,19 +32,4 @@
     {
         Console.WriteLine("void RunSync");
     }
-
-    public async void RunAsyncVoid()
-    {
-        await Task.Delay(100);
-
-        Console.WriteLine("async void RunAsyncVoid");
-    }
-
-    public async Task RunAsyncTask()
-    {
-        await Task.Delay(100);
-
-        Console.WriteLine("Task RunAsyncTask");
-    }
-
 }
